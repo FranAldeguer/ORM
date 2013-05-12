@@ -11,7 +11,7 @@ include 'DB.php';?>
             function (data){
                     $('#listadotable').html(data);
             });
-	}
+	   }
         
         function xml(){
             var db = $('#listadodb').val();
@@ -19,25 +19,34 @@ include 'DB.php';?>
             function (data){
                     $('#codigo').html(data);
             });
-	}
+	   }
         
-        function crearClase(){
+        function claseDB(){
             var db = $('#listadodb').val();
             var tabla = $('#listadotable').val();
-            $.post("crearClase.php",{tabla: tabla, database: db},
+            $.post("claseDB.php",{tabla: tabla, database: db},
             function (data){
                     $('#codigo').html(data);
             });
-	}
+        }
+
+        function claseLogica(){
+                var db = $('#listadodb').val();
+                var tabla = $('#listadotable').val();
+                $.post("claseLogica.php",{tabla: tabla, database: db},
+                function (data){
+                        $('#codigo').html(data);
+                });
+        }
         
-	function formulario(){
-            var db = $('#listadodb').val();
-            var tabla = $('#listadotable').val();
-            $.post("formulario.php",{tabla: tabla, database: db},
-            function (data){
-                $('#codigo').html(data);
-            });
-	}
+    	function formulario(){
+                var db = $('#listadodb').val();
+                var tabla = $('#listadotable').val();
+                $.post("formulario.php",{tabla: tabla, database: db},
+                function (data){
+                    $('#codigo').html(data);
+                });
+    	}
         
         function listado(){
             var db = $('#listadodb').val();
@@ -47,6 +56,7 @@ include 'DB.php';?>
                 $('#codigo').html(data);
             });
         }
+        
         function seleccionarCodigo() {
 			textarea = document.getElementById("codigo");
 			textarea.select();		
@@ -69,10 +79,11 @@ include 'DB.php';?>
                 <select id="listadotable" name="listadotable" onchange="tabla(this.value)">
 
                 </select>
-                <input type="button" onclick="xml()" value="XML">
-                <input type="button" onclick="crearClase()" value="Crear Clase">
-                <input type="button" onclick="formulario()" value="Formulario">
-                <input type="button" onclick="listado()" value="Listado">
+                <button type="button" onclick="xml()"> XML </button>
+                <button type="button" onclick="claseDB()"> DB </button>
+                <button type="button" onclick="claseLogica()"> Logica </button>
+                <button type="button" onclick="formulario()"> Formulario </button>
+                <button type="button" onclick="listado()"> Listado </button>
             </div>
 
 			<div>
