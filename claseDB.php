@@ -22,7 +22,7 @@ $clase.= "&lt;?php\n";
 $clase.="//Dependencias\n";
 $clase.="require_once (\"DB.php\");\n\n";
 
-$clase.= "class C".$tabla."{\n\n";
+$clase.= "class CDB".$tabla."{\n\n";
 
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
@@ -37,11 +37,11 @@ $clase.="\n\n";
  */
 
 $clase.="	/**\n";
-$clase.="	 *Constructor de la clase C".$tabla."\n";
+$clase.="	 *Constructor de la clase CDB".$tabla."\n";
 $clase.="	 */\n";
 
 
-$clase.="	public function C".$tabla."(){\n";
+$clase.="	public function CDB".$tabla."(){\n";
 $clase.="		\$this->ini();\n";
 $clase.="	}";
 $clase.="\n\n";
@@ -231,36 +231,6 @@ $clase.="			return false;\n";
 $clase.="		}\n";
 $clase.="	}\n\n\n\n";
 
-/**
- *
- *CREA LA FUNCIÓN PARA BUSCAR UN OBJETO
- *(__getObj)
- *
- */
-
-$clase.= "	/**\n";
-$clase.= "	 * Devuelve un objeto de tipo C".$tabla."\n";
-$clase.= "	 * @param int \$".$cod."\n";
-$clase.= "	 * @return C".$tabla."\n";
-$clase.= "	 */\n";
-$clase.= "	public static function __getObj(\$".$cod."){\n";
-$clase.= "		//Recoger los resultados de la BD\n";
-$clase.= "		//Solo debe de devolver 1\n";
-
-
-$clase.= "		\$sql = \"SELECT * FROM ".$tabla." WHERE ".$cod." = \".\$".$cod.";\n\n";
-
-
-$clase.= "		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);\n\n";
-	 
-$clase.= "		//Inicializar un objeto con los valores devueltos\n";
-$clase.= "		foreach (\$q as \$arr){\n";
-$clase.= "			\$temp = self::_inicializar(\$arr);\n";
-$clase.= "		}\n\n";
-$clase.= "		return \$temp;\n";
-$clase.= "	}\n\n\n\n";
-
-
 
 /**
  * 
@@ -274,7 +244,7 @@ $clase.="	 * Inicializa un objeto con los valores que se le pasen como parametro
 $clase.="	 * @param Array \$arrValores\n";
 $clase.="	 * @return C".$tabla."\n";
 $clase.="	 */\n";
-$clase.="	private static function _inicializar(\$arrValores){\n";
+$clase.="	protected static function _inicializar(\$arrValores){\n";
 $clase.="		//Estanciar el objeto\n";
 $clase.="		\$temp = new C".$tabla."();\n";
 $clase.="		//Asignarle los valores que se le pasan\n";
@@ -313,54 +283,6 @@ foreach ($q as $campos){
 	$clase.= "		echo \"".$campos["COLUMN_NAME"]." =&gt; \".  \$this->".$campos["COLUMN_NAME"].".\"&lt;br&gt;\";\n";
 };
 $clase.="	}\n\n\n\n";
-
-
-/**
- * 
- * FUNCIÓN PARA BUSCAR OBJETOS SEGÚN LOS PARAMETROS
- * 
- */
-
-$clase.="	/**\n";
-$clase.="	 * Devuelve un listado con objetos  según los parametros que le pasemos\n";
-$clase.="	 * @param array \$info\n";
-$clase.="	 * @param string \$order\n";
-$clase.="	 * @param array \$filtros\n";
-$clase.="	 * @return array C".$tabla."\n";
-$clase.="	 */\n";
-
-
-$clase.="	public static function __getListado(&\$info, \$order = \"id asc\", \$filtros=\"\"){\n";
-$clase.="		//Query\n";
-$clase.="		\$sql = \"SELECT * FROM ".$tabla." WHERE 1 = 1\";\n\n";
-	 
-$clase.="		//Filtros de busqueda\n";
-
-$q = DB::get()->query($sql, PDO::FETCH_ASSOC);
-foreach ($q as $campos){
-	$clase.="		if(isset(\$filtros[\"".$campos["COLUMN_NAME"]."\"])) \$sql.=\" and ".$campos["COLUMN_NAME"]." = '\".\$filtros[\"".$campos["COLUMN_NAME"]."\"].\"'\";\n";
-};
-
-$clase.="\n";
-$clase.="		//Filtros de orden\n";
-$clase.="		\$sql.=\" ORDER BY \".\$order;\n\n";
-	 
-$clase.="		//Recoger los valores de la BD\n";
-$clase.="		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);\n";
-$clase.="		\$info[\"num\"] = \$q->rowCount();\n\n";
-	 
-$clase.="		//Creamos un array de pruebas vacío\n";
-$clase.="		\$arrPru = Array();\n\n";
-	 
-$clase.="		//Recogemos los datos e inicializamos objetos con esos valores\n";
-$clase.="		//Cada objeto lo metemos dentro del array\n";
-$clase.="		foreach (\$q as \$cObj){\n";
-$clase.="			\$temp = self::_inicializar(\$cObj);\n";
-$clase.="			\$arrPru[] = \$temp;\n";
-$clase.="		}\n\n";
-
-$clase.="		return \$arrPru;\n";
-$clase.="	}\n";
 
 
 /**
