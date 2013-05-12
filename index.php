@@ -79,15 +79,15 @@ include 'DB.php';?>
                 <select id="listadotable" name="listadotable" onchange="tabla(this.value)">
 
                 </select>
-                <button type="button" onclick="xml()"> XML </button>
+                <!--<button type="button" onclick="xml()"> XML </button>-->
                 <button type="button" onclick="claseDB()"> DB </button>
                 <button type="button" onclick="claseLogica()"> Logica </button>
-                <button type="button" onclick="formulario()"> Formulario </button>
-                <button type="button" onclick="listado()"> Listado </button>
+                <!--<button type="button" onclick="formulario()"> Formulario </button>-->
+                <!--<button type="button" onclick="listado()"> Listado </button>-->
             </div>
 
 			<div>
-				<button type='button' onclick='seleccionarCodigo()' >Select all</button>
+				<button type='button' onclick='seleccionarCodigo()' >Seleccionar Código</button>
 			</div>
             <div>
               	<textarea id='codigo' cols='200' style='width:1430px;height:665px;'>
