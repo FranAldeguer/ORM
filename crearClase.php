@@ -12,24 +12,23 @@ $sql2 = $sql." and COLUMN_KEY = 'PRI'";
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 
 
-$clase.= "<pre>";
-$clase.= "&lt;?php<br>";
+$clase.= "&lt;?php\n";
 
 /**
  *
  * INCLUYE LOS ARCHIVOS DE CONFIGURACIÓN Y BASE DE DATOS
  *
  */
-$clase.="//Dependencias<br>";
-$clase.="require_once (\"DB.php\");<br><br>";
+$clase.="//Dependencias\n";
+$clase.="require_once (\"DB.php\");\n\n";
 
-$clase.= "class C".$tabla."{<br><br>";
+$clase.= "class C".$tabla."{\n\n";
 
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	$clase.= "	var $".$campos["COLUMN_NAME"].";<br>";
+	$clase.= "	var $".$campos["COLUMN_NAME"].";\n";
 }
-$clase.="<br><br>";
+$clase.="\n\n";
 
 /**
  * 
@@ -37,15 +36,15 @@ $clase.="<br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 *Constructor de la clase C".$tabla."<br>";
-$clase.="	 */<br>";
+$clase.="	/**\n";
+$clase.="	 *Constructor de la clase C".$tabla."\n";
+$clase.="	 */\n";
 
 
-$clase.="	public function C".$tabla."(){<br>";
-$clase.="		\$this->ini();<br>";
+$clase.="	public function C".$tabla."(){\n";
+$clase.="		\$this->ini();\n";
 $clase.="	}";
-$clase.="<br><br>";
+$clase.="\n\n";
 
 /**
  *
@@ -54,20 +53,17 @@ $clase.="<br><br>";
  *
  */
 
-$clase.="	/**<br>";
-$clase.="    * Funcion para insertar un nuevo objeto en la base de datos<br>";
-$clase.="    * @throws Exception -> Si hay un fallo al insertar el obj en la BD<br>";
-$clase.="    * @return int -> Id del utlimo registro insertado || int -> 0<br>";
-$clase.="    */<br>";
+$clase.="	/**\n";
+$clase.="    * Funcion para insertar un nuevo objeto en la base de datos\n";
+$clase.="    * @throws Exception -> Si hay un fallo al insertar el obj en la BD\n";
+$clase.="    * @return int -> Id del utlimo registro insertado || int -> 0\n";
+$clase.="    */\n";
 
-$clase.="	public function insert(){<br>";
-$clase.="		try{<br>";
+$clase.="	public function insert(){\n";
+$clase.="		try{\n";
 
-$clase.="			//Inicializa la transacción<br>";
-$clase.="			DB::get()->beginTransaction();<br><br>";
-
-$clase.="			//Crea la query<br>";
-$clase.="			\$sql = \"INSERT INTO ".$tabla."\"; <br>";
+$clase.="			//Crea la query\n";
+$clase.="			\$sql = \"INSERT INTO ".$tabla."\"; \n";
 $clase.="			\$sql .= \"(";
 
 $i = 1;
@@ -80,8 +76,8 @@ foreach ($q as $campos){
 	$clase.= $coma.$campos["COLUMN_NAME"];
 	$i ++;
 }
-$clase.=")\";<br>";
-$clase.="			\$sql .= \"VALUES(\";<br>";
+$clase.=")\";\n";
+$clase.="			\$sql .= \"VALUES(\";\n";
 
 $i = 1;
 $coma = "";
@@ -90,45 +86,37 @@ foreach ($q as $campos){
 	if($i > 1){
 		$coma = ",";
 	}
-	$clase.="			\$sql .= \"".$coma."'\".\$this->".$campos["COLUMN_NAME"].".\"'\";<br>";
+	$clase.="			\$sql .= \"".$coma."'\".\$this->".$campos["COLUMN_NAME"].".\"'\";\n";
 	$i ++;
 }
-$clase.="			\$sql .= \")\";<br><br>";
+$clase.="			\$sql .= \")\";\n\n";
 
-$clase.="			//Ejecuta la query<br>";
-$clase.="			\$q = DB::get()->exec(\$sql);<br><br>";
+$clase.="			//Ejecuta la query\n";
+$clase.="			\$q = DB::get()->exec(\$sql);\n\n";
 
-$clase.="			//Comprueba que no hay errores en la inserción<br>";
-$clase.= "			if (\$q->errorInfo[0] != 00000) throw new Exception(\"Error al insertar\");<br><br>";
+$clase.="			//Comprueba que no hay errores en la inserción\n";
+$clase.= "			if (\$q->errorInfo[0] != 00000) throw new Exception(\"Error al insertar\");\n\n";
 
-$clase.="			//Pone el id correctamten al objeto insertado<br>";
+$clase.="			//Pone el id correctamten al objeto insertado\n";
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	if($campos["COLUMN_KEY"]=="PRI")
-	$clase.="			\$this->".$campos["COLUMN_NAME"]." = DB::get()->lastInsertId();<br><br>";
+	if($campos["COLUMN_KEY"]=="PRI"){
+		$clase.="			\$this->".$campos["COLUMN_NAME"]." = DB::get()->lastInsertId();\n\n";
+	
+	
+		$clase.="			//Devuelve el ultimo id\n";
+		$clase.="			return \$this->".$campos["COLUMN_NAME"].";\n\n";
+	}
 }
+$clase.="		}catch(Excepction \$e){\n";
 
-$clase.="			//Devuelve el id del ultimo registro insertado<br>";
-$clase.="			\$return = DB::get()->lastInsertId();<br><br>";
+$clase.="			//Muestra el mensaje de error de la excepción\n";
+$clase.="			echo \$e->getMessage();\n\n";
 
-$clase.="			 //Finaliza correctamente la transaccion<br>";
-$clase.="			DB::get()->commit();<br><br>";
+$clase.="			return 0;\n";
 
-$clase.="			//Devuelve el ultimo id<br>";
-$clase.="			return \$return;<br><br>";
-
-$clase.="		}catch(Excepction \$e){<br>";
-
-$clase.="			//Finaliza la transaccion sin guardar los cambios<br>";
-$clase.="			DB::get()->rollBack();<br><br>";
-
-$clase.="			//Muestra el mensaje de error de la excepción<br>";
-$clase.="			echo \$e->getMessage();<br><br>";
-
-$clase.="			return 0;<br>";
-
-$clase.="		}<br>";
-$clase.="	}<br><br><br><br>";
+$clase.="		}\n";
+$clase.="	}\n\n\n\n";
 
 
 /**
@@ -139,16 +127,16 @@ $clase.="	}<br><br><br><br>";
  */
 
 
-$clase.= "	/**<br>";
-$clase.= "	 * Funcion para eliminar un objeto<br>";
-$clase.= "	 * @return boolean<br>";
-$clase.= "	 */<br>";
+$clase.= "	/**\n";
+$clase.= "	 * Funcion para eliminar un objeto\n";
+$clase.= "	 * @return boolean\n";
+$clase.= "	 */\n";
 
 
-$clase.= "	public function delete(){<br>";
-$clase.= "		//Llama al metodo estatico de borrar y le pasa el id del objeto actual<br>";
-$clase.= "		self::__delete(\$this->id);<br>";
-$clase.= "	}<br><br><br><br>";
+$clase.= "	public function delete(){\n";
+$clase.= "		//Llama al metodo estatico de borrar y le pasa el id del objeto actual\n";
+$clase.= "		self::__delete(\$this->id);\n";
+$clase.= "	}\n\n\n\n";
 
 /**
  * 
@@ -157,49 +145,43 @@ $clase.= "	}<br><br><br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 * Funcion para eliminar un objeto<br>";
-$clase.="	 * @param int \$id_prueba<br>";
-$clase.="	 * @throws Exception<br>";
-$clase.="	 * @return boolean<br>";
-$clase.="	 */<br>";
+$clase.="	/**\n";
+$clase.="	 * Funcion para eliminar un objeto\n";
+$clase.="	 * @param int \$id_prueba\n";
+$clase.="	 * @throws Exception\n";
+$clase.="	 * @return boolean\n";
+$clase.="	 */\n";
 
 $q = DB::get()->query($sql2, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
 	$cod = $campos["COLUMN_NAME"];
 }
 
-$clase.="	public static function __delete(\$".$cod."){<br>";
-$clase.="		try{<br>";
-$clase.="			//Inicia la transaccion<br>";
-$clase.="			DB::get()->beginTransaction();<br><br>";
+$clase.="	public static function __delete(\$".$cod."){\n";
+$clase.="		try{\n";
 			 
-$clase.="			//Ejecucion de la query<br>";
+$clase.="			//Ejecucion de la query\n";
 
 $q = DB::get()->query($sql2, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
 	if($campos["COLUMN_KEY"]=="PRI"){
-		$clase.="			\$sql = \"DELETE FROM ".$tabla." WHERE ".$campos["COLUMN_NAME"]." = \".\$".$cod.";<br><br>";
+		$clase.="			\$sql = \"DELETE FROM ".$tabla." WHERE ".$campos["COLUMN_NAME"]." = \".\$".$cod.";\n\n";
 	}
 }
 	
 
-$clase.="			\$q = DB::get()->exec(\$sql);<br><br>";
+$clase.="			\$q = DB::get()->exec(\$sql);\n\n";
 
-$clase.="			//Comprobación de fallos<br>";
-$clase.="			if(\$q != 1) throw new Exception(\"Fallo al eliminar\");<br><br>";
+$clase.="			//Comprobación de fallos\n";
+$clase.="			if(\$q != 1) throw new Exception(\"Fallo al eliminar\");\n\n";
 
-$clase.="			//Finaliza la transaccion correctamente<br>";
-$clase.="			DB::get()->commit();<br><br>";
-$clase.="			return true;<br><br>";
-$clase.="		}catch (Exception \$e){<br><br>";
-$clase.="			//Finaliza la transaccion con errores<br>";
-$clase.="			DB::get()->rollBack();<br><br>";
-$clase.="			//Muestra el mensaje de error<br>";
-$clase.="			echo \$e->getMessage();<br><br>";
-$clase.="			return false;<br>";
-$clase.="		}<br>";
-$clase.="	}<br><br><br><br>";
+$clase.="			return true;\n\n";
+$clase.="		}catch (Exception \$e){\n\n";
+$clase.="			//Muestra el mensaje de error\n";
+$clase.="			echo \$e->getMessage();\n\n";
+$clase.="			return false;\n";
+$clase.="		}\n";
+$clase.="	}\n\n\n\n";
 
 
 
@@ -210,18 +192,16 @@ $clase.="	}<br><br><br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 * Actualiza los parametros de un objeto<br>";
-$clase.="	 * @throws Exception<br>";
-$clase.="	 * @return boolean<br>";
-$clase.="	 */<br>";
-$clase.="	public function update(){<br>";
-$clase.="		try{<br>";
-$clase.="			//Inicializa la transaccion<br>";
-$clase.="			DB::get()->beginTransaction();<br><br>";
+$clase.="	/**\n";
+$clase.="	 * Actualiza los parametros de un objeto\n";
+$clase.="	 * @throws Exception\n";
+$clase.="	 * @return boolean\n";
+$clase.="	 */\n";
+$clase.="	public function update(){\n";
+$clase.="		try{\n";
 
-$clase.="			//Ejecución de la query<br>";
-$clase.="			\$sql = \"UPDATE ".$tabla." SET\";<br><br>";
+$clase.="			//Ejecución de la query\n";
+$clase.="			\$sql = \"UPDATE ".$tabla." SET\";\n\n";
  
 $i = 1;
 $coma = "";
@@ -230,30 +210,26 @@ foreach ($q as $campos){
 	if($i > 1){
 		$coma = ", ";
 	}
-	$clase.= "			\$sql.= \"".$coma." ".$campos["COLUMN_NAME"]."='\".\$this->".$campos["COLUMN_NAME"].".\"'\";<br>";
+	$clase.= "			\$sql.= \"".$coma." ".$campos["COLUMN_NAME"]."='\".\$this->".$campos["COLUMN_NAME"].".\"'\";\n";
 	$i ++;
 }
 
-$clase.="			\$sql.= \" WHERE 1=1\";<br>";
-$clase.="			\$sql.= \" and ".$cod." = '\".\$this->".$cod.".\"'\";<br><br>";
+$clase.="			\$sql.= \" WHERE 1=1\";\n";
+$clase.="			\$sql.= \" and ".$cod." = '\".\$this->".$cod.".\"'\";\n\n";
 
-$clase.="			//Ejecución de la query<br>";
-$clase.="			\$q = DB::get()->exec(\$sql);<br><br>";
+$clase.="			//Ejecución de la query\n";
+$clase.="			\$q = DB::get()->exec(\$sql);\n\n";
 	
-$clase.="			//Comprobación de errores<br>";
-$clase.="			if(\$q != 1) throw new Exception(\"Error en la modificación\");<br><br>";
+$clase.="			//Comprobación de errores\n";
+$clase.="			if(\$q != 1) throw new Exception(\"Error en la modificación\");\n\n";
 
-$clase.="			//Finaliza la transaccion correctamente<br>";
-$clase.="			DB::get()->commit();<br><br>";
-$clase.="			return true;<br><br>";
-$clase.="		}catch (Exception \$e){<br><br>";
-$clase.="			//Finaliza la transaccion con errores<br>";
-$clase.="			DB::get()->rollBack();<br><br>";
-$clase.="			//Muestra el mensaje de error<br>";
-$clase.="			echo \$e->getMessage();<br><br>";
-$clase.="			return false;<br>";
-$clase.="		}<br>";
-$clase.="	}<br><br><br><br>";
+$clase.="			return true;\n\n";
+$clase.="		}catch (Exception \$e){\n\n";
+$clase.="			//Muestra el mensaje de error\n";
+$clase.="			echo \$e->getMessage();\n\n";
+$clase.="			return false;\n";
+$clase.="		}\n";
+$clase.="	}\n\n\n\n";
 
 /**
  *
@@ -262,27 +238,27 @@ $clase.="	}<br><br><br><br>";
  *
  */
 
-$clase.= "	/**<br>";
-$clase.= "	 * Devuelve un objeto de tipo C".$tabla."<br>";
-$clase.= "	 * @param int \$".$cod."<br>";
-$clase.= "	 * @return C".$tabla."<br>";
-$clase.= "	 */<br>";
-$clase.= "	public static function __getObj(\$".$cod."){<br>";
-$clase.= "		//Recoger los resultados de la BD<br>";
-$clase.= "		//Solo debe de devolver 1<br>";
+$clase.= "	/**\n";
+$clase.= "	 * Devuelve un objeto de tipo C".$tabla."\n";
+$clase.= "	 * @param int \$".$cod."\n";
+$clase.= "	 * @return C".$tabla."\n";
+$clase.= "	 */\n";
+$clase.= "	public static function __getObj(\$".$cod."){\n";
+$clase.= "		//Recoger los resultados de la BD\n";
+$clase.= "		//Solo debe de devolver 1\n";
 
 
-$clase.= "		\$sql = \"SELECT * FROM ".$tabla." WHERE ".$cod." = \".\$".$cod.";<br><br>";
+$clase.= "		\$sql = \"SELECT * FROM ".$tabla." WHERE ".$cod." = \".\$".$cod.";\n\n";
 
 
-$clase.= "		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);<br><br>";
+$clase.= "		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);\n\n";
 	 
-$clase.= "		//Inicializar un objeto con los valores devueltos<br>";
-$clase.= "		foreach (\$q as \$arr){<br>";
-$clase.= "			\$temp = self::_inicializar(\$arr);<br>";
-$clase.= "		}<br><br>";
-$clase.= "		return \$temp;<br>";
-$clase.= "	}<br><br><br><br>";
+$clase.= "		//Inicializar un objeto con los valores devueltos\n";
+$clase.= "		foreach (\$q as \$arr){\n";
+$clase.= "			\$temp = self::_inicializar(\$arr);\n";
+$clase.= "		}\n\n";
+$clase.= "		return \$temp;\n";
+$clase.= "	}\n\n\n\n";
 
 
 
@@ -293,33 +269,33 @@ $clase.= "	}<br><br><br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 * Inicializa un objeto con los valores que se le pasen como parametros<br>";
-$clase.="	 * @param Array \$arrValores<br>";
-$clase.="	 * @return C".$tabla."<br>";
-$clase.="	 */<br>";
-$clase.="	private static function _inicializar(\$arrValores){<br>";
-$clase.="		//Estanciar el objeto<br>";
-$clase.="		\$temp = new C".$tabla."();<br>";
-$clase.="		//Asignarle los valores que se le pasan<br>";
+$clase.="	/**\n";
+$clase.="	 * Inicializa un objeto con los valores que se le pasen como parametros\n";
+$clase.="	 * @param Array \$arrValores\n";
+$clase.="	 * @return C".$tabla."\n";
+$clase.="	 */\n";
+$clase.="	private static function _inicializar(\$arrValores){\n";
+$clase.="		//Estanciar el objeto\n";
+$clase.="		\$temp = new C".$tabla."();\n";
+$clase.="		//Asignarle los valores que se le pasan\n";
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	$clase.= "		\$temp->".$campos["COLUMN_NAME"]."= \$arrValores[\"".$campos["COLUMN_NAME"]."\"];<br>";
+	$clase.= "		\$temp->".$campos["COLUMN_NAME"]."= \$arrValores[\"".$campos["COLUMN_NAME"]."\"];\n";
 } 
-$clase.="		return \$temp;<br>";
-$clase.="	}<br><br><br><br>";
+$clase.="		return \$temp;\n";
+$clase.="	}\n\n\n\n";
 
 
 
-$clase.="	/**<br>";
-$clase.="	 * Inicializa las propiedades del objeto<br>";
-$clase.="	 */<br>";
-$clase.="	private function ini(){<br>";
+$clase.="	/**\n";
+$clase.="	 * Inicializa las propiedades del objeto\n";
+$clase.="	 */\n";
+$clase.="	private function ini(){\n";
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	$clase.= "		\$this->".$campos["COLUMN_NAME"]."= \"".$campos["COLUMN_DEFAULT"]."\";<br>";
+	$clase.= "		\$this->".$campos["COLUMN_NAME"]."= \"".$campos["COLUMN_DEFAULT"]."\";\n";
 };
-$clase.="	}<br><br><br><br>";
+$clase.="	}\n\n\n\n";
 
 
 /**
@@ -328,15 +304,15 @@ $clase.="	}<br><br><br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 * Mostrar el contenido del objeto<br>";
-$clase.="	 */<br>";
-$clase.="	public function mostrar(){<br>";
+$clase.="	/**\n";
+$clase.="	 * Mostrar el contenido del objeto\n";
+$clase.="	 */\n";
+$clase.="	public function mostrar(){\n";
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	$clase.= "		echo \"".$campos["COLUMN_NAME"]." =&gt; \".  \$this->".$campos["COLUMN_NAME"].".\"&lt;br&gt;\";<br>";
+	$clase.= "		echo \"".$campos["COLUMN_NAME"]." =&gt; \".  \$this->".$campos["COLUMN_NAME"].".\"&lt;br&gt;\";\n";
 };
-$clase.="	}<br><br><br><br>";
+$clase.="	}\n\n\n\n";
 
 
 /**
@@ -345,52 +321,52 @@ $clase.="	}<br><br><br><br>";
  * 
  */
 
-$clase.="	/**<br>";
-$clase.="	 * Devuelve un listado con objetos  según los parametros que le pasemos<br>";
-$clase.="	 * @param array \$info<br>";
-$clase.="	 * @param string \$order<br>";
-$clase.="	 * @param array \$filtros<br>";
-$clase.="	 * @return array C".$tabla."<br>";
-$clase.="	 */<br>";
+$clase.="	/**\n";
+$clase.="	 * Devuelve un listado con objetos  según los parametros que le pasemos\n";
+$clase.="	 * @param array \$info\n";
+$clase.="	 * @param string \$order\n";
+$clase.="	 * @param array \$filtros\n";
+$clase.="	 * @return array C".$tabla."\n";
+$clase.="	 */\n";
 
 
-$clase.="	public static function __getListado(&\$info, \$order = \"id asc\", \$filtros=\"\"){<br>";
-$clase.="		//Query<br>";
-$clase.="		\$sql = \"SELECT * FROM ".$tabla." WHERE 1 = 1\";<br><br>";
+$clase.="	public static function __getListado(&\$info, \$order = \"id asc\", \$filtros=\"\"){\n";
+$clase.="		//Query\n";
+$clase.="		\$sql = \"SELECT * FROM ".$tabla." WHERE 1 = 1\";\n\n";
 	 
-$clase.="		//Filtros de busqueda<br>";
+$clase.="		//Filtros de busqueda\n";
 
 $q = DB::get()->query($sql, PDO::FETCH_ASSOC);
 foreach ($q as $campos){
-	$clase.="		if(isset(\$filtros[\"".$campos["COLUMN_NAME"]."\"])) \$sql.=\" and ".$campos["COLUMN_NAME"]." = '\".\$filtros[\"".$campos["COLUMN_NAME"]."\"].\"'\";<br>";
+	$clase.="		if(isset(\$filtros[\"".$campos["COLUMN_NAME"]."\"])) \$sql.=\" and ".$campos["COLUMN_NAME"]." = '\".\$filtros[\"".$campos["COLUMN_NAME"]."\"].\"'\";\n";
 };
 
-$clase.="<br>";
-$clase.="		//Filtros de orden<br>";
-$clase.="		\$sql.=\" ORDER BY \".\$order;<br><br>";
+$clase.="\n";
+$clase.="		//Filtros de orden\n";
+$clase.="		\$sql.=\" ORDER BY \".\$order;\n\n";
 	 
-$clase.="		//Recoger los valores de la BD<br>";
-$clase.="		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);<br><br>";
+$clase.="		//Recoger los valores de la BD\n";
+$clase.="		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);\n";
+$clase.="		\$info[\"num\"] = \$q->rowCount();\n\n";
 	 
-$clase.="		//Creamos un array de pruebas vacío<br>";
-$clase.="		\$arrPru = Array();<br><br>";
+$clase.="		//Creamos un array de pruebas vacío\n";
+$clase.="		\$arrPru = Array();\n\n";
 	 
-$clase.="		//Recogemos los datos e inicializamos objetos con esos valores<br>";
-$clase.="		//Cada objeto lo metemos dentro del array<br>";
-$clase.="		foreach (\$q as \$cObj){<br>";
-$clase.="			\$temp = self::_inicializar(\$cObj);<br>";
-$clase.="			\$arrPru[] = \$temp;<br>";
-$clase.="		}<br><br>";
+$clase.="		//Recogemos los datos e inicializamos objetos con esos valores\n";
+$clase.="		//Cada objeto lo metemos dentro del array\n";
+$clase.="		foreach (\$q as \$cObj){\n";
+$clase.="			\$temp = self::_inicializar(\$cObj);\n";
+$clase.="			\$arrPru[] = \$temp;\n";
+$clase.="		}\n\n";
 
-$clase.="		return \$arrPru;<br>";
-$clase.="	}<br>";
+$clase.="		return \$arrPru;\n";
+$clase.="	}\n";
 
 
 /**
  *Cerrar clase y php
  */
-$clase.="}<br>";
+$clase.="}\n";
 $clase.="?>";
-$clase .= "</pre>";
 
 echo $clase;

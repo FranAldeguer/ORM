@@ -47,6 +47,10 @@ include 'DB.php';?>
                 $('#codigo').html(data);
             });
         }
+        function seleccionarCodigo() {
+			textarea = document.getElementById("codigo");
+			textarea.select();		
+		}
 	</script>
     </head>
     <body>
@@ -70,8 +74,14 @@ include 'DB.php';?>
                 <input type="button" onclick="formulario()" value="Formulario">
                 <input type="button" onclick="listado()" value="Listado">
             </div>
+
+			<div>
+				<button type='button' onclick='seleccionarCodigo()' >Select all</button>
+			</div>
             <div>
-                <pre id="codigo"></pre>
+              	<textarea id='codigo' cols='200' style='width:1430px;height:665px;'>
+
+				</textarea>
             </div>
         </form>
     </body>
