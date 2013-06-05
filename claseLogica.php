@@ -92,6 +92,30 @@ $clase.= "		return \$temp;\n";
 $clase.= "	}\n\n\n\n";
 
 
+/**
+ * 
+ * CREA LA FUNCIÓN ESTATICA PARA ELIMINAR
+ * (__DELETE)
+ * 
+ */
+
+
+$clase.= "	/**\n";
+$clase.= "	 * Funcion para eliminar un objeto\n";
+$clase.= "	 * @return boolean\n";
+$clase.= "	 */\n";
+
+$q = DB::get()->query($sql2, PDO::FETCH_ASSOC);
+foreach ($q as $campos){
+	if($campos["COLUMN_KEY"]=="PRI"){
+		$clase.= "	public static function __delete(\$".$campos["COLUMN_NAME"]."){\n";
+
+		$clase.= "		//Llama al metodo estatico de borrar y le pasa el id del objeto actual\n";
+		$clase.= "		return C".$tabla."::__getObj(\$".$campos["COLUMN_NAME"].")->delete();\n";
+		$clase.= "	}\n\n\n\n";
+	}
+}
+
 
 /**
  * 
@@ -127,17 +151,17 @@ $clase.="		//Recoger los valores de la BD\n";
 $clase.="		\$q = DB::get()->query(\$sql, PDO::FETCH_ASSOC);\n";
 $clase.="		\$info[\"num\"] = \$q->rowCount();\n\n";
 	 
-$clase.="		//Creamos un array de pruebas vacío\n";
-$clase.="		\$arrPru = Array();\n\n";
+$clase.="		//Creamos un array vacío\n";
+$clase.="		\$arrReturn = Array();\n\n";
 	 
 $clase.="		//Recogemos los datos e inicializamos objetos con esos valores\n";
 $clase.="		//Cada objeto lo metemos dentro del array\n";
 $clase.="		foreach (\$q as \$cObj){\n";
 $clase.="			\$temp = self::_inicializar(\$cObj);\n";
-$clase.="			\$arrPru[] = \$temp;\n";
+$clase.="			\$arrReturn[] = \$temp;\n";
 $clase.="		}\n\n";
 
-$clase.="		return \$arrPru;\n";
+$clase.="		return \$arrReturn;\n";
 $clase.="	}\n";
 
 
