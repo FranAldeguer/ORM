@@ -20,7 +20,7 @@ class DB {
      * @param 
      * @return $objInstance; 
      */ 
-    public static function get(  ) { 
+    public static function get() { 
     	
         $host = "localhost";
         $db   = "information_schema";
@@ -43,7 +43,7 @@ class DB {
      */ 
     final public static function __callStatic( $chrMethod, $arrArguments ) { 
             
-        $objInstance = self::getInstance(); 
+        $objInstance = self::get(); 
         
         return call_user_func_array(array($objInstance, $chrMethod), $arrArguments); 
         

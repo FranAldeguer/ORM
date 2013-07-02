@@ -3,7 +3,7 @@ include 'DB.php';?>
 <html>
     <head>
         <script src="scripts/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript">
+        <script type="text/javascript">
         function cargarTablas(db){
             //database = db;
             //alert(database);
@@ -75,7 +75,7 @@ include 'DB.php';?>
                             echo "<option value=". $fila['SCHEMA_NAME'].">". $fila['SCHEMA_NAME']."</option>";
                         }
                     ?>
-                </select>
+                </select> 
                 <select id="listadotable" name="listadotable" onchange="tabla(this.value)">
 
                 </select>
